@@ -16,8 +16,8 @@ namespace SensorDataManager
 
             config.Routes.MapHttpRoute(
                 name: "DefaultApi",
-                routeTemplate: "api/{controller}/{id}",
-                defaults: new { id = RouteParameter.Optional }
+                routeTemplate: "api/{controller}/{dataSource}/{van}/{tot}",
+                defaults: new { van = RouteParameter.Optional, tot = RouteParameter.Optional }
             );
         }
     }
