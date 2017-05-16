@@ -13,9 +13,12 @@ namespace SensorDataManager
 
             // Web API routes
             config.MapHttpAttributeRoutes();
-
             config.Routes.MapHttpRoute(
-                name: "DefaultApi",
+               name: "DefaultApi",
+               routeTemplate: "api/{controller}/"               
+           );
+            config.Routes.MapHttpRoute(
+                name: "SensorData",
                 routeTemplate: "api/{controller}/{dataSource}/{van}/{tot}",
                 defaults: new { van = RouteParameter.Optional, tot = RouteParameter.Optional }
             );

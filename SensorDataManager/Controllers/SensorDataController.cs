@@ -18,6 +18,9 @@ namespace SensorDataManager.Controllers
     public class SensorDataController : ApiController
     {
         private SensorDataSqlEntities db = new SensorDataSqlEntities();
+     
+           TimeZoneInfo info = TimeZoneInfo.FindSystemTimeZoneById("Central Europe Standard Time");
+
 
         // GET: api/SensorData
         public IQueryable<SensorData> Get()
@@ -32,7 +35,11 @@ namespace SensorDataManager.Controllers
             var vandaag = DateTime.Now;
             var vanDateTime = new DateTime(vandaag.Year, vandaag.Month, vandaag.Day);
             var totDateTime = new DateTime(vandaag.Year, vandaag.Month, vandaag.Day,23,59,59);
-            return db.SensorData.Where(w => w.DeviceId == dataSource && w.TimeStamp >= vanDateTime && w.TimeStamp <= totDateTime);
+            var results= db.SensorData.Where(w => w.DeviceId == dataSource && w.TimeStamp >= vanDateTime && w.TimeStamp <= totDateTime);
+            foreach (var result in results) {
+                result.TimeStamp = TimeZoneInfo.ConvertTimeFromUtc(result.TimeStamp, info);
+            }
+            return results;            
         }
 
         // GET: api/SensorData/5

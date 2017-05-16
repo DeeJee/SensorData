@@ -3,67 +3,63 @@
     ViewBag.Title = "Index";
 }
 <h2>Index</h2>
-<canvas id="lineChart" width="400" height="400"></canvas>
-<canvas id="humidity" width="400" height="400"></canvas>
-<canvas id="rssi" width="400" height="400"></canvas>
+
 @Scripts.Render("~/bundles/jquery")
 <script type="text/javascript">
+
     $.ajax({
 
-        url: "http://localhost:55458/api/SensorData/ESP8266/",
+        url: "/api/DataSource/",
 
         context: document.body
 
-    }).success(function (data, status, nogiets) {
-        var labels = new Array();
-        var humidity = new Array();
-        var intensity = new Array();
-        var rssi = new Array();
-        data.forEach(function (item) {
-            var itm = JSON.parse(item.Payload);
-            labels.push(item.TimeStamp);
-            humidity.push(itm.Humidity);
-            rssi.push(itm.Rssi);
-            intensity.push(itm.Intensity);
+    }).success(function (dataSource, status, nogiets) {
+
+        $.each(dataSource, function (index, value) {
+            $('#DataSource').append($('<option/>', {
+                value: value,
+                text: value
+            }));
         });
+    });
 
+    showData = function () {
+        var dataSource = $("#DataSource option:selected").text();
+        $("h1 .Title").text("noot");
+        $.ajax({
+            url: "http://localhost:55458/api/SensorData/" + dataSource,
+            context: document.body
+        }).success(function (measurements, status, nogiets) {
+            var labels = new Array();
+            var humidity = new Array();
+            var intensity = new Array();
+            var rssi = new Array();
+            var voltage = new Array();
+            measurements.forEach(function (item) {
+                var itm = JSON.parse(item.Payload);
+                labels.push(item.TimeStamp);
+                humidity.push(itm.Humidity);
+                rssi.push(itm.RSSI);
+                intensity.push(itm.Intensity);
+                voltage.push(itm.Voltage);
+            });
 
+            var ctx = document.getElementById("intensity");
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'intensity',
+                        data: intensity,
+                        borderColor: [
+                            'rgba(0,0,0,1)'
+                        ],
+                        borderWidth: 1,
+                        fill: false,
+                        lineTension: 0.1,
+                        borderCapStyle: 'butt',
 
-        var lineChart = document.getElementById("lineChart");
-
-        var data = {
-            labels: ["January", "February", "March", "April", "May", "June", "July"],
-            datasets: [
-                {
-                    label: "My First dataset",
-                    fill: false,
-                    lineTension: 0.1,
-                    backgroundColor: "rgba(75,192,192,0.4)",
-                    borderColor: "rgba(75,192,192,1)",
-                    borderCapStyle: 'butt',
-                    borderDash: [],
-                    borderDashOffset: 0.0,
-                    borderJoinStyle: 'miter',
-                    pointBorderColor: "rgba(75,192,192,1)",
-                    pointBackgroundColor: "#fff",
-                    pointBorderWidth: 1,
-                    pointHoverRadius: 5,
-                    pointHoverBackgroundColor: "rgba(75,192,192,1)",
-                    pointHoverBorderColor: "rgba(220,220,220,1)",
-                    pointHoverBorderWidth: 2,
-                    pointRadius: 1,
-                    pointHitRadius: 10,
-                    data: [65, 59, 80, 81, 56, 55, 40],
-                    spanGaps: false,
-                }
-            ]
-        };
-        var myLineChart = Chart.Line(lineChart, {
-            data: {
-                labels: ["January", "February", "March", "April", "May", "June", "July"],
-                datasets: [
-                    {
-                        label: "My First dataset",
                         fill: false,
                         lineTension: 0.1,
                         backgroundColor: "rgba(75,192,192,0.4)",
@@ -81,83 +77,193 @@
                         pointHoverBorderWidth: 2,
                         pointRadius: 1,
                         pointHitRadius: 10,
-                        data: [65, 59, 80, 81, 56, 55, 40],
-                        spanGaps: false,
+                        spanGaps: false
+                    }]
+                },
+                options: {
+                    scales: {
+                        yAxes: [{
+                            ticks: {
+                                beginAtZero: true
+                            }
+                        }]
                     }
-                ]
-            },
-            options: {
-                scales: {
-                    xAxes: [{
-                        type: 'linear',
-                        position: 'bottom'
-                    }]
                 }
-            }
+            });
 
-        });
+            var ctx = document.getElementById("rssi");
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'rssi',
+                        data: rssi,
+
+                        borderColor: [
+                            'rgba(255,99,132,1)',
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(255, 206, 86, 1)',
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(153, 102, 255, 1)',
+                            'rgba(255, 159, 64, 1)'
+                        ],
+                        borderWidth: 1,
 
 
-
-        var ctx = document.getElementById("humidity");
-        new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: 'humidity',
-                    data: humidity,
-                  
-                    borderColor: [
-                        'rgba(0,0,0,1)'
-                       
-                    ],
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                scales: {
-                    yAxes: [{
-                        ticks: {
-                            beginAtZero: true
-                        }
+                        fill: false,
+                        lineTension: 0.1,
+                        backgroundColor: "rgba(75,192,192,0.4)",
+                        borderColor: "rgba(75,192,192,1)",
+                        borderCapStyle: 'butt',
+                        borderDash: [],
+                        borderDashOffset: 0.0,
+                        borderJoinStyle: 'miter',
+                        pointBorderColor: "rgba(75,192,192,1)",
+                        pointBackgroundColor: "#fff",
+                        pointBorderWidth: 1,
+                        pointHoverRadius: 5,
+                        pointHoverBackgroundColor: "rgba(75,192,192,1)",
+                        pointHoverBorderColor: "rgba(220,220,220,1)",
+                        pointHoverBorderWidth: 2,
+                        pointRadius: 1,
+                        pointHitRadius: 10,
+                        spanGaps: false
                     }]
+                },
+                options: {
+                    scales: {
+                        yAxes: [{
+                            ticks: {
+                                beginAtZero: true
+                            }
+                        }]
+                    }
                 }
-            }
-        });
+            });
 
-        var ctx = document.getElementById("rssi");
-        new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: 'rssi',
-                    data: rssi,
+            var ctx = document.getElementById("voltage");
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'voltage',
+                        data: voltage,
 
-                    borderColor: [
-                        'rgba(255,99,132,1)',
-                        'rgba(54, 162, 235, 1)',
-                        'rgba(255, 206, 86, 1)',
-                        'rgba(75, 192, 192, 1)',
-                        'rgba(153, 102, 255, 1)',
-                        'rgba(255, 159, 64, 1)'
-                    ],
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                scales: {
-                    yAxes: [{
-                        ticks: {
-                            beginAtZero: true
-                        }
+                        borderColor: [
+                            'rgba(255,99,132,1)',
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(255, 206, 86, 1)',
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(153, 102, 255, 1)',
+                            'rgba(255, 159, 64, 1)'
+                        ],
+                        borderWidth: 1,
+                        fill: false,
+                        lineTension: 0.1,
+                        backgroundColor: "rgba(75,192,192,0.4)",
+                        borderColor: "rgba(75,192,192,1)",
+                        borderCapStyle: 'butt',
+                        borderDash: [],
+                        borderDashOffset: 0.0,
+                        borderJoinStyle: 'miter',
+                        pointBorderColor: "rgba(75,192,192,1)",
+                        pointBackgroundColor: "#fff",
+                        pointBorderWidth: 1,
+                        pointHoverRadius: 5,
+                        pointHoverBackgroundColor: "rgba(75,192,192,1)",
+                        pointHoverBorderColor: "rgba(220,220,220,1)",
+                        pointHoverBorderWidth: 2,
+                        pointRadius: 1,
+                        pointHitRadius: 10,
+                        spanGaps: false
                     }]
+                },
+                options: {
+                    scales: {
+                        yAxes: [{
+                            ticks: {
+                                beginAtZero: true
+                            }
+                        }]
+                    }
                 }
-            }
+            });
+
+        }).error(function () {
+            alert("mislukt");
         });
-    }).error(function () {
-        alert("mislukt");
-    });
+    };
+
+    showData();
 </script>
 
+
+<nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">Project name</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+            <form class="navbar-form navbar-right">
+                <div class="form-group">
+                    <input type="text" placeholder="Email" class="form-control">
+                </div>
+                <div class="form-group">
+                    <input type="password" placeholder="Password" class="form-control">
+                </div>
+                <button type="submit" class="btn btn-success">Sign in</button>
+            </form>
+        </div><!--/.navbar-collapse -->
+    </div>
+</nav>
+
+<!-- Main jumbotron for a primary marketing message or call to action -->
+<div class="jumbotron">
+    <div class="container">
+        <h1 class="Title">aap</h1>
+        <form class="navbar-form navbar-right">
+            <div class="form-group">
+                Datasource:
+            </div>
+            <div class="form-group">
+                <select id="DataSource" class="form-control"></select>
+            </div>
+            <button type="button" class="btn btn-primary" onclick="showData()">OK</button>
+        </form>
+
+    </div>
+</div>
+
+<div class="container">
+    <!-- Example row of columns -->
+    <div class="row">
+        <div class="col-md-4">
+            <canvas id="intensity" width="400" height="400"></canvas>
+        </div>
+        <div class="col-md-4">
+            <canvas id="voltage" width="400" height="400"></canvas>
+        </div>
+        <div class="col-md-4">
+            <canvas id="rssi" width="400" height="400"></canvas>
+        </div>
+    </div>
+
+    <hr>
+
+    <footer>
+        <p>&copy; 2016 Company, Inc.</p>
+    </footer>
+</div> <!-- /container -->
+<!-- Bootstrap core JavaScript
+================================================== -->
+<!-- Placed at the end of the document so the pages load faster -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script>window.jQuery || document.write('<script src="../../assets/js/vendor/jquery.min.js"><\/script>')</script>   
