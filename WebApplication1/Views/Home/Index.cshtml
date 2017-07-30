@@ -1,7 +1,280 @@
 ﻿@{
     ViewBag.Title = "Home Page";
 }
+<script type="text/javascript">
 
+    var host="http://localhost:58847";
+    var intensityChart;
+    var voltageChart;
+    var rssiChart;
+    $.ajax({
+        url: host + "/api/DataSource/",
+        dataType: "json",
+        context: document.body
+    }).success(function (dataSource, status, nogiets) {
+
+        $.each(dataSource, function (index, value) {
+            $('#DataSource').append($('<option/>', {
+                value: value,
+                text: value
+            }));
+        });
+        $('#DataSource').val("4F").change();
+
+    });
+
+    function drawChart(name, labels, dataSource) {
+        if (intensityChart) {
+            intensityChart.data.datasets[0].data = intensity;
+            intensityChart.update();
+        }
+        else {
+            var ctx = document.getElementById("intensity");
+            intensityChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'intensity',
+                        data: intensity,
+                        borderColor: [
+                            'rgba(0,0,0,1)'
+                        ],
+                        borderWidth: 1,
+                        fill: false,
+                        lineTension: 0.1,
+                        borderCapStyle: 'butt',
+
+                        fill: false,
+                        lineTension: 0.1,
+                        backgroundColor: "rgba(75,192,192,0.4)",
+                        borderColor: "rgba(75,192,192,1)",
+                        borderCapStyle: 'butt',
+                        borderDash: [],
+                        borderDashOffset: 0.0,
+                        borderJoinStyle: 'miter',
+                        pointBorderColor: "rgba(75,192,192,1)",
+                        pointBackgroundColor: "#fff",
+                        pointBorderWidth: 1,
+                        pointHoverRadius: 5,
+                        pointHoverBackgroundColor: "rgba(75,192,192,1)",
+                        pointHoverBorderColor: "rgba(220,220,220,1)",
+                        pointHoverBorderWidth: 2,
+                        pointRadius: 1,
+                        pointHitRadius: 10,
+                        spanGaps: false
+                    }]
+                },
+                options: {
+                    scales: {
+                        yAxes: [{
+                            ticks: {
+                                beginAtZero: true
+                            }
+                        }]
+                    }
+                }
+            });
+        }
+    }
+
+    showData = function () {
+        var dataSource = $("#DataSource option:selected").text();
+        if (!dataSource) { return; }
+        $("h1 .Title").text("noot");
+        $.ajax({
+            url: host + "/api/SensorData/" + dataSource,
+            context: document.body,
+            dataType: "json"            
+        }).success(function (measurements, status, nogiets) {
+            var labels = new Array();
+            var humidity = new Array();
+            var intensity = new Array();
+            var rssi = new Array();
+            var voltage = new Array();
+            measurements.forEach(function (item) {
+                var itm = JSON.parse(item.Payload);
+                labels.push(item.TimeStamp);
+                humidity.push(itm.Humidity);
+                rssi.push(itm.RSSI);
+                intensity.push(itm.Intensity);
+                voltage.push(itm.Voltage);
+            });
+
+            //drawChart("intensity", labels, intensity);
+            var ctx = document.getElementById("intensity");
+            if (intensityChart) {
+                intensityChart.data.datasets[0].data = intensity;
+                intensityChart.update();
+            }
+            else {
+                intensityChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'intensity',
+                            data: intensity,
+                            borderColor: [
+                                'rgba(0,0,0,1)'
+                            ],
+                            borderWidth: 1,
+                            fill: false,
+                            lineTension: 0.1,
+                            borderCapStyle: 'butt',
+
+                            fill: false,
+                            lineTension: 0.1,
+                            backgroundColor: "rgba(75,192,192,0.4)",
+                            borderColor: "rgba(75,192,192,1)",
+                            borderCapStyle: 'butt',
+                            borderDash: [],
+                            borderDashOffset: 0.0,
+                            borderJoinStyle: 'miter',
+                            pointBorderColor: "rgba(75,192,192,1)",
+                            pointBackgroundColor: "#fff",
+                            pointBorderWidth: 1,
+                            pointHoverRadius: 5,
+                            pointHoverBackgroundColor: "rgba(75,192,192,1)",
+                            pointHoverBorderColor: "rgba(220,220,220,1)",
+                            pointHoverBorderWidth: 2,
+                            pointRadius: 1,
+                            pointHitRadius: 10,
+                            spanGaps: false
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            yAxes: [{
+                                ticks: {
+                                    beginAtZero: true
+                                }
+                            }]
+                        }
+                    }
+                });
+            }
+
+            if (rssiChart) {
+                rssiChart.data.datasets[0].data = rssi;
+                rssiChart.update();
+            }
+            else {
+                var ctx = document.getElementById("rssi");
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'rssi',
+                            data: rssi,
+
+                            borderColor: [
+                                'rgba(255,99,132,1)',
+                                'rgba(54, 162, 235, 1)',
+                                'rgba(255, 206, 86, 1)',
+                                'rgba(75, 192, 192, 1)',
+                                'rgba(153, 102, 255, 1)',
+                                'rgba(255, 159, 64, 1)'
+                            ],
+                            borderWidth: 1,
+
+
+                            fill: false,
+                            lineTension: 0.1,
+                            backgroundColor: "rgba(75,192,192,0.4)",
+                            borderColor: "rgba(75,192,192,1)",
+                            borderCapStyle: 'butt',
+                            borderDash: [],
+                            borderDashOffset: 0.0,
+                            borderJoinStyle: 'miter',
+                            pointBorderColor: "rgba(75,192,192,1)",
+                            pointBackgroundColor: "#fff",
+                            pointBorderWidth: 1,
+                            pointHoverRadius: 5,
+                            pointHoverBackgroundColor: "rgba(75,192,192,1)",
+                            pointHoverBorderColor: "rgba(220,220,220,1)",
+                            pointHoverBorderWidth: 2,
+                            pointRadius: 1,
+                            pointHitRadius: 10,
+                            spanGaps: false
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            yAxes: [{
+                                ticks: {
+                                    beginAtZero: true
+                                }
+                            }]
+                        }
+                    }
+                });
+            }
+
+            if (voltageChart) {
+                voltageChart.data.datasets[0].data = voltage;
+                voltageChart.update();
+            }
+            else {
+                var ctx = document.getElementById("voltage");
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'voltage',
+                            data: voltage,
+
+                            borderColor: [
+                                'rgba(255,99,132,1)',
+                                'rgba(54, 162, 235, 1)',
+                                'rgba(255, 206, 86, 1)',
+                                'rgba(75, 192, 192, 1)',
+                                'rgba(153, 102, 255, 1)',
+                                'rgba(255, 159, 64, 1)'
+                            ],
+                            borderWidth: 1,
+                            fill: false,
+                            lineTension: 0.1,
+                            backgroundColor: "rgba(75,192,192,0.4)",
+                            borderColor: "rgba(75,192,192,1)",
+                            borderCapStyle: 'butt',
+                            borderDash: [],
+                            borderDashOffset: 0.0,
+                            borderJoinStyle: 'miter',
+                            pointBorderColor: "rgba(75,192,192,1)",
+                            pointBackgroundColor: "#fff",
+                            pointBorderWidth: 1,
+                            pointHoverRadius: 5,
+                            pointHoverBackgroundColor: "rgba(75,192,192,1)",
+                            pointHoverBorderColor: "rgba(220,220,220,1)",
+                            pointHoverBorderWidth: 2,
+                            pointRadius: 1,
+                            pointHitRadius: 10,
+                            spanGaps: false
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            yAxes: [{
+                                ticks: {
+                                    beginAtZero: true
+                                }
+                            }]
+                        }
+                    }
+                });
+            }
+
+        }).error(function () {
+            alert("mislukt");
+        });
+    };
+
+
+    showData();
+</script>
 <div class="jumbotron">
     <h1>ASP.NET</h1>
     <p class="lead">ASP.NET is a free web framework for building great Web sites and Web applications using HTML, CSS and JavaScript.</p>
@@ -9,23 +282,17 @@
 </div>
 
 <div class="row">
-    <div class="col-md-4">
-        <h2>Getting started</h2>
-        <p>
-            ASP.NET MVC gives you a powerful, patterns-based way to build dynamic websites that
-            enables a clean separation of concerns and gives you full control over markup
-            for enjoyable, agile development.
-        </p>
-        <p><a class="btn btn-default" href="http://go.microsoft.com/fwlink/?LinkId=301865">Learn more &raquo;</a></p>
+    <div class="col-md-12">
+        <canvas id="intensity" width="400" height="400"></canvas>
     </div>
-    <div class="col-md-4">
-        <h2>Get more libraries</h2>
-        <p>NuGet is a free Visual Studio extension that makes it easy to add, remove, and update libraries and tools in Visual Studio projects.</p>
-        <p><a class="btn btn-default" href="http://go.microsoft.com/fwlink/?LinkId=301866">Learn more &raquo;</a></p>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <canvas id="rssi" width="400" height="400"></canvas>
     </div>
-    <div class="col-md-4">
-        <h2>Web Hosting</h2>
-        <p>You can easily find a web hosting company that offers the right mix of features and price for your applications.</p>
-        <p><a class="btn btn-default" href="http://go.microsoft.com/fwlink/?LinkId=301867">Learn more &raquo;</a></p>
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <canvas id="voltage" width="400" height="400"></canvas>
     </div>
 </div>
