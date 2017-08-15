@@ -1,8 +1,9 @@
 ﻿using System.Web.Http;
 using Microsoft.Owin.Security.OAuth;
 using System.Web.Http.ExceptionHandling;
-using System.Web.Mvc;
 using System.Web.Http.Cors;
+using SensorDataApi.Attributes;
+using System.Web.Mvc;
 
 namespace SensorDataApi
 {
@@ -18,7 +19,7 @@ namespace SensorDataApi
             // Web API routes
             config.MapHttpAttributeRoutes();
 
-            var cors = new EnableCorsAttribute("http://localhost:4200,http://sensordataapp.azurewebsites.net", "*", "*");
+            var cors = new EnableCorsAttribute("http://localhost:4200,http://sensordataapp.azurewebsites.net,https://sensordataapp.azurewebsites.net", "*", "*");
             config.EnableCors(cors);
             //config.EnableCors(new EnableCorsAttribute("*", "*", "*"));
 
@@ -31,6 +32,9 @@ namespace SensorDataApi
                 routeTemplate: "api/{controller}/{dataSource}",
                 defaults: new { dataSource = UrlParameter.Optional }
             );
+
+            config.Filters.Add(new Attributes.RequireHttpsAttribute());
+            //config.Filters.Add(new BasicAuthenticationAttribute());
         }
     }
 }

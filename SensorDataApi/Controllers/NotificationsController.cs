@@ -9,6 +9,7 @@ using System.Net.Http;
 using System.Web.Http;
 using System.Web.Http.Description;
 using SensorDataApi.Data;
+using SensorDataApi.Attributes;
 
 namespace SensorDataApi.Controllers
 {
@@ -72,6 +73,7 @@ namespace SensorDataApi.Controllers
 
         // POST: api/Notifications
         [ResponseType(typeof(Notifications))]
+        [BasicAuthenticationAttribute]
         public IHttpActionResult PostNotifications(Notifications notifications)
         {
             if (!ModelState.IsValid)

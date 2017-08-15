@@ -1,4 +1,5 @@
 ﻿using NLog;
+using SensorDataApi.Attributes;
 using SensorDataApi.Data;
 using SensorDataApi.Models;
 using System;
@@ -129,6 +130,7 @@ namespace SensorDataApi.Controllers
         }
 
         // POST: api/SensorData
+        [BasicAuthenticationAttribute]
         public IHttpActionResult PostSensorData(DataModel sensorData)
         {
             logger.Info($"POST: {Request.RequestUri} called");

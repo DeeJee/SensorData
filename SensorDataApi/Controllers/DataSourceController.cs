@@ -1,4 +1,5 @@
 ﻿using NLog;
+using SensorDataApi.Attributes;
 using SensorDataApi.Data;
 using SensorDataApi.Models;
 using System.Collections.Generic;
@@ -13,9 +14,6 @@ using System.Web.Http.Description;
 
 namespace SensorDataApi.Controllers
 {
-    //[EnableCors(origins: "http://sensordataapp.azurewebsites.net", headers: "*", methods: "*")]
-    //[EnableCors(origins: "http://localhost:4200,http://sensordataapp.azurewebsites.net", headers: "*", methods: "*")]
-    //[EnableCors(origins: "*", headers: "*", methods: "*")]
     public class DataSourceController : ApiController
     {
         private static Logger logger = LogManager.GetCurrentClassLogger();
@@ -135,7 +133,7 @@ namespace SensorDataApi.Controllers
         }
 
         // POST: api/DataSource
-        [ResponseType(typeof(void))]
+        [ResponseType(typeof(void))]        
         public IHttpActionResult Post(DataSource dataSource)
         {
             logger.Info($"POST: {Request.RequestUri} called");
