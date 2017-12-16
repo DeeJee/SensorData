@@ -19,19 +19,20 @@ namespace SensorDataApi
             // Web API routes
             config.MapHttpAttributeRoutes();
 
-            var cors = new EnableCorsAttribute("http://localhost:4200,http://sensordataapp.azurewebsites.net,https://sensordataapp.azurewebsites.net", "*", "*");
+            var cors = new EnableCorsAttribute("http://localhost:4200,https://localhost:4200,http://sensordataapp.azurewebsites.net,https://sensordataapp.azurewebsites.net", "*", "*");
             config.EnableCors(cors);
             //config.EnableCors(new EnableCorsAttribute("*", "*", "*"));
 
-            // config.Routes.MapHttpRoute(
-            //    name: "NewDataSources",
-            //    routeTemplate: "api/{controller}/{action}"
-            //);
             config.Routes.MapHttpRoute(
                 name: "DefaultApi",
-                routeTemplate: "api/{controller}/{dataSource}",
-                defaults: new { dataSource = UrlParameter.Optional }
+                routeTemplate: "api/{controller}/{id}",
+                defaults: new { id = RouteParameter.Optional }
             );
+            //config.Routes.MapHttpRoute(
+            //    name: "DefaultApi",
+            //    routeTemplate: "api/{controller}/{dataSource}",
+            //    defaults: new { dataSource = UrlParameter.Optional }
+            //);
 
             config.Filters.Add(new Attributes.RequireHttpsAttribute());
             //config.Filters.Add(new BasicAuthenticationAttribute());

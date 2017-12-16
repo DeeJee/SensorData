@@ -45,6 +45,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="AutoMapper, Version=6.1.1.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
+      <HintPath>..\packages\AutoMapper.6.1.1\lib\net45\AutoMapper.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Microsoft.AI.Agent.Intercept, Version=2.0.6.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.ApplicationInsights.Agent.Intercept.2.0.6\lib\net45\Microsoft.AI.Agent.Intercept.dll</HintPath>
       <Private>True</Private>
@@ -250,11 +254,10 @@
     <Compile Include="Attributes\BasicAuthenticationAttribute.cs" />
     <Compile Include="Attributes\RequireHttpsAttribute.cs" />
     <Compile Include="Controllers\DataSourceController.cs" />
+    <Compile Include="Controllers\DataTypesController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\NotificationsController.cs" />
     <Compile Include="Controllers\SensorDataController.cs" />
-    <Compile Include="Controllers\TestController.cs" />
-    <Compile Include="Controllers\ValuesController.cs" />
     <Compile Include="CustomExceptionHandler.cs" />
     <Compile Include="Data\Channel.cs">
       <DependentUpon>SensorDataModel.tt</DependentUpon>
@@ -262,7 +265,10 @@
     <Compile Include="Data\DataSource.cs">
       <DependentUpon>SensorDataModel.tt</DependentUpon>
     </Compile>
-    <Compile Include="Data\Notifications.cs">
+    <Compile Include="Data\DataType.cs">
+      <DependentUpon>SensorDataModel.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Data\Notification.cs">
       <DependentUpon>SensorDataModel.tt</DependentUpon>
     </Compile>
     <Compile Include="Data\SensorData.cs">
@@ -286,9 +292,11 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="infrastructure\AutomapperConfig.cs" />
     <Compile Include="Models\DataModel.cs" />
     <Compile Include="Models\Datasource.cs" />
     <Compile Include="Models\DatasourceType.cs" />
+    <Compile Include="Models\DataType.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Providers\ApplicationOAuthProvider.cs" />

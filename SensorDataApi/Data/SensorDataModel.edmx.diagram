@@ -7,9 +7,10 @@
       <Diagram DiagramId="3da4915714cc4586abd61e3a4a3aa679" Name="Diagram1">
         <EntityTypeShape EntityType="SensorDataSqlModel.SensorData" Width="1.5" PointX="0.75" PointY="0.75" IsExpanded="true" />
         <EntityTypeShape EntityType="SensorDataSqlModel.Channel" Width="1.5" PointX="3.375" PointY="0.875" />
-        <EntityTypeShape EntityType="SensorDataSqlModel.DataSource" Width="1.5" PointX="5.625" PointY="0.875" />
-        <AssociationConnector Association="SensorDataSqlModel.FK_DataSource_DatasourceType" />
-        <EntityTypeShape EntityType="SensorDataSqlModel.Notifications" Width="1.5" PointX="0.75" PointY="3.75" />
+        <EntityTypeShape EntityType="SensorDataSqlModel.DataSource" Width="1.5" PointX="5.75" PointY="0.875" />
+        <EntityTypeShape EntityType="SensorDataSqlModel.Notification" Width="1.5" PointX="0.75" PointY="3.75" />
+        <EntityTypeShape EntityType="SensorDataSqlModel.DataType" Width="1.5" PointX="3.375" PointY="3.75" />
+        <AssociationConnector Association="SensorDataSqlModel.FK_DataSource_DataType" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

@@ -16,9 +16,10 @@ namespace SensorDataApi.Data
     {
         public int Id { get; set; }
         public string DeviceId { get; set; }
-        public int ChannelId { get; set; }
+        public Nullable<int> ChannelId { get; set; }
         public string Description { get; set; }
+        public int DataTypeId { get; set; }
     
-        public virtual Channel Channel { get; set; }
+        public virtual DataType DataType { get; set; }
     }
 }

@@ -1,6 +1,8 @@
-﻿using NLog;
+﻿using AutoMapper;
+using NLog;
 using SensorDataApi.Attributes;
 using SensorDataApi.Data;
+using SensorDataApi.infrastructure;
 using SensorDataApi.Models;
 using System.Collections.Generic;
 using System.Data.Entity;
@@ -8,6 +10,7 @@ using System.Data.Entity.Infrastructure;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Web;
 using System.Web.Http;
 using System.Web.Http.Cors;
 using System.Web.Http.Description;
@@ -18,6 +21,7 @@ namespace SensorDataApi.Controllers
     {
         private static Logger logger = LogManager.GetCurrentClassLogger();
         private SensorDataSqlEntities db = new SensorDataSqlEntities();
+        private IMapper mapper = AutomapperConfig.CreateMapper();
 
         [HttpGet]
         [Route("api/DataSource/NewDatasources")]
@@ -34,7 +38,8 @@ namespace SensorDataApi.Controllers
         }
 
         // GET: api/DataSource/5
-        public IQueryable<DataSource> Get()
+        [HttpGet]
+        public IQueryable<Models.Datasource> GetDataSource()
         {
             logger.Info($"GET: {Request.RequestUri} called");
             var qsp = Request.GetQueryNameValuePairs();
@@ -46,24 +51,18 @@ namespace SensorDataApi.Controllers
                 int id;
                 if (int.TryParse(channel, out id))
                 {
-                    query = query.Where(w => w.ChannelId == id).AsQueryable();
+                    query = query.Where(w => w.DataTypeId == id).AsQueryable();
                 }
             }
 
             logger.Info($"GET: {Request.RequestUri} finished");
             logger.Info($"{query.Count()} items retrieved");
 
-            List<DataSource> results = new List<DataSource>();
+            List< Models.Datasource> results = new List<Models.Datasource>();
             foreach (var item in query)
             {
-                results.Add(new DataSource
-                {
-                    Id = item.Id,
-                    DeviceId = item.DeviceId,
-                    Description = item.Description,
-                    ChannelId = item.ChannelId
-                }
-                );
+                var ds = mapper.Map<Models.Datasource>(item);
+                results.Add(ds);
             }
             return results.AsQueryable();
         }
@@ -133,8 +132,8 @@ namespace SensorDataApi.Controllers
         }
 
         // POST: api/DataSource
-        [ResponseType(typeof(void))]        
-        public IHttpActionResult Post(DataSource dataSource)
+        [ResponseType(typeof(void))]
+        public HttpResponseMessage Post(DataSource dataSource)
         {
             logger.Info($"POST: {Request.RequestUri} called");
             logger.Info("Storing Datasource: Id={0}, DeviceId={1}, Type={2}, Description={3}",
@@ -144,18 +143,26 @@ namespace SensorDataApi.Controllers
                 dataSource.Description);
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                return Request.CreateErrorResponse(HttpStatusCode.BadRequest, ModelState);
             }
 
             db.DataSource.Add(dataSource);
-            db.SaveChanges();
-
+            try
+            {
+                db.SaveChanges();
+            }
+            catch (DbUpdateException ex)
+            {
+                logger.Error(ex);
+                HttpError err = new HttpError(ex.InnerException.InnerException.Message);
+                return Request.CreateResponse(HttpStatusCode.InternalServerError, err);
+            }
             logger.Info("Datasource added: Id={0}, DeviceId={1}, Type={2}, Description={3}",
                 dataSource.Id,
                 dataSource.DeviceId,
                 dataSource.ChannelId,
                 dataSource.Description);
-            return Ok();
+            return Request.CreateResponse(HttpStatusCode.Created);
         }
 
         // DELETE: api/DataSource/5

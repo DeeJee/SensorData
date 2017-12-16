@@ -20,10 +20,19 @@
           </Key>
           <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
           <Property Name="DeviceId" Type="nvarchar" MaxLength="18" Nullable="false" />
-          <Property Name="ChannelId" Type="int" Nullable="false" />
+          <Property Name="ChannelId" Type="int" />
           <Property Name="Description" Type="nvarchar" MaxLength="50" />
+          <Property Name="DataTypeId" Type="int" Nullable="false" />
         </EntityType>
-        <EntityType Name="Notifications">
+        <EntityType Name="DataType">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Name" Type="nvarchar" MaxLength="50" Nullable="false" />
+          <Property Name="Properties" Type="nvarchar" MaxLength="200" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Notification">
           <Key>
             <PropertyRef Name="Id" />
           </Key>
@@ -42,25 +51,26 @@
           <Property Name="DeviceId" Type="nvarchar" MaxLength="18" Nullable="false" />
           <Property Name="Payload" Type="text" Nullable="false" />
         </EntityType>
-        <Association Name="FK_DataSource_DatasourceType">
-          <End Role="Channel" Type="Self.Channel" Multiplicity="1" />
+        <Association Name="FK_DataSource_DataType">
+          <End Role="DataType" Type="Self.DataType" Multiplicity="1" />
           <End Role="DataSource" Type="Self.DataSource" Multiplicity="*" />
           <ReferentialConstraint>
-            <Principal Role="Channel">
+            <Principal Role="DataType">
               <PropertyRef Name="Id" />
             </Principal>
             <Dependent Role="DataSource">
-              <PropertyRef Name="ChannelId" />
+              <PropertyRef Name="DataTypeId" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
         <EntityContainer Name="SensorDataSqlModelStoreContainer">
           <EntitySet Name="Channel" EntityType="Self.Channel" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="DataSource" EntityType="Self.DataSource" Schema="dbo" store:Type="Tables" />
-          <EntitySet Name="Notifications" EntityType="Self.Notifications" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="DataType" EntityType="Self.DataType" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Notification" EntityType="Self.Notification" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="SensorData" EntityType="Self.SensorData" Schema="dbo" store:Type="Tables" />
-          <AssociationSet Name="FK_DataSource_DatasourceType" Association="Self.FK_DataSource_DatasourceType">
-            <End Role="Channel" EntitySet="Channel" />
+          <AssociationSet Name="FK_DataSource_DataType" Association="Self.FK_DataSource_DataType">
+            <End Role="DataType" EntitySet="DataType" />
             <End Role="DataSource" EntitySet="DataSource" />
           </AssociationSet>
         </EntityContainer>
@@ -81,11 +91,12 @@
           <EntitySet Name="SensorData" EntityType="Self.SensorData" />
           <EntitySet Name="Channel" EntityType="SensorDataSqlModel.Channel" />
           <EntitySet Name="DataSource" EntityType="SensorDataSqlModel.DataSource" />
-          <AssociationSet Name="FK_DataSource_DatasourceType" Association="SensorDataSqlModel.FK_DataSource_DatasourceType">
-            <End Role="Channel" EntitySet="Channel" />
+          <EntitySet Name="Notification" EntityType="SensorDataSqlModel.Notification" />
+          <EntitySet Name="DataType" EntityType="SensorDataSqlModel.DataType" />
+          <AssociationSet Name="FK_DataSource_DataType" Association="SensorDataSqlModel.FK_DataSource_DataType">
+            <End Role="DataType" EntitySet="DataType" />
             <End Role="DataSource" EntitySet="DataSource" />
           </AssociationSet>
-          <EntitySet Name="Notifications" EntityType="SensorDataSqlModel.Notifications" />
         </EntityContainer>
         <EntityType Name="Channel">
           <Key>
@@ -95,7 +106,6 @@
           <Property Name="Name" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
           <Property Name="Description" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
           <Property Name="Created" Type="DateTime" Nullable="false" Precision="3" />
-          <NavigationProperty Name="DataSource" Relationship="SensorDataSqlModel.FK_DataSource_DatasourceType" FromRole="Channel" ToRole="DataSource" />
         </EntityType>
         <EntityType Name="DataSource">
           <Key>
@@ -103,23 +113,12 @@
           </Key>
           <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
           <Property Name="DeviceId" Type="String" Nullable="false" MaxLength="18" FixedLength="false" Unicode="true" />
-          <Property Name="ChannelId" Type="Int32" Nullable="false" />
+          <Property Name="ChannelId" Type="Int32" />
           <Property Name="Description" Type="String" MaxLength="50" FixedLength="false" Unicode="true" />
-          <NavigationProperty Name="Channel" Relationship="SensorDataSqlModel.FK_DataSource_DatasourceType" FromRole="DataSource" ToRole="Channel" />
+          <Property Name="DataTypeId" Type="Int32" Nullable="false" />
+          <NavigationProperty Name="DataType" Relationship="SensorDataSqlModel.FK_DataSource_DataType" FromRole="DataSource" ToRole="DataType" />
         </EntityType>
-        <Association Name="FK_DataSource_DatasourceType">
-          <End Type="SensorDataSqlModel.Channel" Role="Channel" Multiplicity="1" />
-          <End Type="SensorDataSqlModel.DataSource" Role="DataSource" Multiplicity="*" />
-          <ReferentialConstraint>
-            <Principal Role="Channel">
-              <PropertyRef Name="Id" />
-            </Principal>
-            <Dependent Role="DataSource">
-              <PropertyRef Name="ChannelId" />
-            </Dependent>
-          </ReferentialConstraint>
-        </Association>
-        <EntityType Name="Notifications">
+        <EntityType Name="Notification">
           <Key>
             <PropertyRef Name="Id" />
           </Key>
@@ -129,6 +128,27 @@
           <Property Name="Text" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
           <Property Name="Created" Type="DateTime" Precision="3" />
         </EntityType>
+        <EntityType Name="DataType">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Name" Type="String" Nullable="false" MaxLength="50" FixedLength="false" Unicode="true" />
+          <Property Name="Properties" Type="String" Nullable="false" MaxLength="200" FixedLength="false" Unicode="true" />
+          <NavigationProperty Name="DataSource" Relationship="SensorDataSqlModel.FK_DataSource_DataType" FromRole="DataType" ToRole="DataSource" />
+        </EntityType>
+        <Association Name="FK_DataSource_DataType">
+          <End Type="SensorDataSqlModel.DataType" Role="DataType" Multiplicity="1" />
+          <End Type="SensorDataSqlModel.DataSource" Role="DataSource" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="DataType">
+              <PropertyRef Name="Id" />
+            </Principal>
+            <Dependent Role="DataSource">
+              <PropertyRef Name="DataTypeId" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -158,6 +178,7 @@
           <EntitySetMapping Name="DataSource">
             <EntityTypeMapping TypeName="SensorDataSqlModel.DataSource">
               <MappingFragment StoreEntitySet="DataSource">
+                <ScalarProperty Name="DataTypeId" ColumnName="DataTypeId" />
                 <ScalarProperty Name="Description" ColumnName="Description" />
                 <ScalarProperty Name="ChannelId" ColumnName="ChannelId" />
                 <ScalarProperty Name="DeviceId" ColumnName="DeviceId" />
@@ -165,13 +186,22 @@
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>
-          <EntitySetMapping Name="Notifications">
-            <EntityTypeMapping TypeName="SensorDataSqlModel.Notifications">
-              <MappingFragment StoreEntitySet="Notifications">
+          <EntitySetMapping Name="Notification">
+            <EntityTypeMapping TypeName="SensorDataSqlModel.Notification">
+              <MappingFragment StoreEntitySet="Notification">
                 <ScalarProperty Name="Created" ColumnName="Created" />
                 <ScalarProperty Name="Text" ColumnName="Text" />
                 <ScalarProperty Name="LogLevel" ColumnName="LogLevel" />
                 <ScalarProperty Name="DeviceId" ColumnName="DeviceId" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="DataType">
+            <EntityTypeMapping TypeName="SensorDataSqlModel.DataType">
+              <MappingFragment StoreEntitySet="DataType">
+                <ScalarProperty Name="Properties" ColumnName="Properties" />
+                <ScalarProperty Name="Name" ColumnName="Name" />
                 <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>

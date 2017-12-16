@@ -1,4 +1,5 @@
 ﻿using NLog;
+using SensorDataApi.infrastructure;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,6 +22,8 @@ namespace SensorDataApi
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
+
+            AutomapperConfig.Configure();
 
             logger.Info("Application started");
         }

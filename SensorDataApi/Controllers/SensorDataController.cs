@@ -34,11 +34,11 @@ namespace SensorDataApi.Controllers
 
         // GET: api/SensorData/5
         [ResponseType(typeof(SensorData))]
-        public IQueryable<SensorData> Get(string dataSource)
+        public IQueryable<SensorData> Get(string id)
         {
             DateTime vanDateTime;
             DateTime totDateTime;
-            var results = db.SensorData.Where(w => w.DeviceId == dataSource);
+            var results = db.SensorData.Where(w => w.DeviceId == id);
 
             IEnumerable<KeyValuePair<string, string>> allUrlKeyValues = ControllerContext.Request.GetQueryNameValuePairs();
             string vanDatum = allUrlKeyValues.FirstOrDefault(x => x.Key == "van").Value;
@@ -48,26 +48,26 @@ namespace SensorDataApi.Controllers
             {
                 logger.Info($"GET: {Request.RequestUri} called");
                 var vandaag = DateTime.Now.Date;
-                vanDateTime = new DateTime(vandaag.Year, vandaag.Month, vandaag.Day);
-                totDateTime = new DateTime(vandaag.Year, vandaag.Month, vandaag.Day, 23, 59, 59);
-                var maxDate = db.SensorData.Where(w => w.DeviceId == dataSource).Max(m => m.TimeStamp);
+                vanDateTime = TimeZoneInfo.ConvertTimeToUtc(new DateTime(vandaag.Year, vandaag.Month, vandaag.Day), info);
+                totDateTime = TimeZoneInfo.ConvertTimeToUtc(new DateTime(vandaag.Year, vandaag.Month, vandaag.Day, 23, 59, 59), info);
+                var maxDate = db.SensorData.Where(w => w.DeviceId == id).Max(m => m.TimeStamp);
                 results = results.Where(w => DbFunctions.TruncateTime(w.TimeStamp) == maxDate.Date);
             }
             else
             {
                 if (!string.IsNullOrEmpty(vanDatum))
                 {
-                    vanDateTime = DateTime.ParseExact(vanDatum, "yyyy-MM-dd", nederland);
-                    results=results.Where(w => DbFunctions.TruncateTime(w.TimeStamp) >= vanDateTime);
+                    vanDateTime = TimeZoneInfo.ConvertTimeToUtc(DateTime.ParseExact(vanDatum, "yyyy-MM-dd", nederland), info);
+                    //results=results.Where(w => DbFunctions.TruncateTime(w.TimeStamp) >= vanDateTime);
+                    results = results.Where(w => w.TimeStamp >= vanDateTime);
                 }
                 if (!string.IsNullOrEmpty(totDatum))
                 {
-                    totDateTime = DateTime.ParseExact(totDatum, "yyyy-MM-dd", nederland);
-                    results=results.Where(w => DbFunctions.TruncateTime(w.TimeStamp) <= totDateTime);
+                    totDateTime = TimeZoneInfo.ConvertTimeToUtc(DateTime.ParseExact(totDatum, "yyyy-MM-dd", nederland), info);
+                    //results=results.Where(w => DbFunctions.TruncateTime(w.TimeStamp) <= totDateTime);
+                    results = results.Where(w => w.TimeStamp <= totDateTime);
                 }
             }
-
-
 
             foreach (var result in results)
             {
@@ -77,6 +77,22 @@ namespace SensorDataApi.Controllers
             logger.Info($"GET: {Request.RequestUri} finished");
             logger.Info($"{results.Count()} items retrieved");
             return results;
+        }
+
+        // GET: api/SensorData/5
+        [ResponseType(typeof(SensorData))]
+        [Route("api/SensorData/{id}/MostRecent")]
+        [HttpGet]
+        public IHttpActionResult MostRecent(string id)
+        {
+            var data = db.SensorData.Where(w => w.DeviceId == id).OrderByDescending(o => o.Id).Take(1).SingleOrDefault();
+            if (data != null)
+            {
+                data.TimeStamp = TimeZoneInfo.ConvertTimeFromUtc(data.TimeStamp, info);
+                logger.Info($"GET: {Request.RequestUri} finished");
+                return Ok(data);
+            }
+            return NotFound();
         }
 
         //// GET: api/SensorData/5
@@ -148,7 +164,7 @@ namespace SensorDataApi.Controllers
             });
             db.SaveChanges();
 
-            logger.Info("Dataset added");
+            logger.Info("Dataset added for sensor ", sensorData.DeviceId);
             return Ok();
         }
 
@@ -181,5 +197,7 @@ namespace SensorDataApi.Controllers
         {
             return db.SensorData.Count(e => e.Id == id) > 0;
         }
+
+
     }
 }

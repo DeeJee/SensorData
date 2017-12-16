@@ -28,6 +28,7 @@ namespace SensorDataApi.Data
         public virtual DbSet<SensorData> SensorData { get; set; }
         public virtual DbSet<Channel> Channel { get; set; }
         public virtual DbSet<DataSource> DataSource { get; set; }
-        public virtual DbSet<Notifications> Notifications { get; set; }
+        public virtual DbSet<Notification> Notification { get; set; }
+        public virtual DbSet<DataType> DataType { get; set; }
     }
 }
